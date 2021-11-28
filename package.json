@@ -1,0 +1,21 @@
+{
+  "name": "mainserver",
+  "version": "1.0.0",
+  "description": "zoom look alike project main sever",
+  "main": "mainServer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "asad hmeed",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
