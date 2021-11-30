@@ -39,11 +39,15 @@ const register = (req, res) => {
  */
 const login = (req, res) => {
   const { email, password } = req.body;
+  console.log("email: ",email);
+  console.log("password: ",password);
   const uniqid=uuidv4()// unique id to adentify the user when logout
   userModule.findOne({ email: email }, (err, data) => {
     if (err) {
+      console.log(err);
       return res.status(401).send({msg:"email or password incorrect"});
     }
+    console.log(data);
     if (password === data.password) {
       if(data.role !== "admin"){
         userModule.find({role: "admin"},(err,data) => {

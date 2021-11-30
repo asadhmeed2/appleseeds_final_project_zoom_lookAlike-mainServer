@@ -2,6 +2,13 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 app.use(cors());
+require("dotenv").config()
+const bodyParser = require("body-parser");
+const loginRouter = require("./routes/login.route")
+const adminRouter = require("./routes/admin.route")
+const mongoose =require("mongoose");
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server);
@@ -10,14 +17,14 @@ const users = {};//save users  ids that connected to particular room with room i
 const socketToRoom = {};// save users id and witch room thear in  
 io.on("connection", (socket) => {
   console.log("a user connected");
-  socket.on("join room", roomID => {
-    if (users[roomID]) {//if there is some one connected to the room 
-        users[roomID].push(socket.id); // add the new user id to the room 
+  socket.on("join room", data => {
+    if (users[data.roomID]) {//if there is some one connected to the room 
+        users[data.roomID].push(socket.id); // add the new user id to the room 
     } else {
-        users[roomID] = [socket.id];//initialize the room weth the first user id 
+        users[data.roomID] = [socket.id];//initialize the room weth the first user id 
     }
-    socketToRoom[socket.id] = roomID; //add the user id and room id to the socketToRoom
-    const usersInThisRoom = users[roomID].filter(id => id !== socket.id);//filter the users ids to send to the client and make peer conction with them 
+    socketToRoom[socket.id] = data.roomID; //add the user id and room id to the socketToRoom
+    const usersInThisRoom = users[data.roomID].filter(id => id !== socket.id);//filter the users ids to send to the client and make peer conction with them 
 
     socket.emit("all users", usersInThisRoom);
 });
@@ -43,7 +50,15 @@ socket.on('disconnect', () => {
 });
 });
 
-
+app.use("/",loginRouter);
+app.use("/",adminRouter);
+mongoose.connect(
+    `mongodb+srv://asadhm:${process.env.MONGODB_PASSWORD}@cluster0.jdmn4.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
+    { useNewUrlParser: true, useUnifiedTopology: true },
+    () => {
+      console.log("Connected to DB");
+    }
+  );
 
 server.listen(process.env.PORT || 4000, () => {
   console.log(`listening of port ${process.env.PORT || 4000}`);
