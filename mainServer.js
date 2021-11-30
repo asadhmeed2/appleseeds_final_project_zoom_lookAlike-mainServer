@@ -17,14 +17,14 @@ const users = {};//save users  ids that connected to particular room with room i
 const socketToRoom = {};// save users id and witch room thear in  
 io.on("connection", (socket) => {
   console.log("a user connected");
-  socket.on("join room", data => {
-    if (users[data.roomID]) {//if there is some one connected to the room 
-        users[data.roomID].push(socket.id); // add the new user id to the room 
+  socket.on("join room", roomID => {
+    if (users[roomID]) {//if there is some one connected to the room 
+        users[roomID].push(socket.id); // add the new user id to the room 
     } else {
-        users[data.roomID] = [socket.id];//initialize the room weth the first user id 
+        users[roomID] = [socket.id];//initialize the room weth the first user id 
     }
-    socketToRoom[socket.id] = data.roomID; //add the user id and room id to the socketToRoom
-    const usersInThisRoom = users[data.roomID].filter(id => id !== socket.id);//filter the users ids to send to the client and make peer conction with them 
+    socketToRoom[socket.id] = roomID; //add the user id and room id to the socketToRoom
+    const usersInThisRoom = users[roomID].filter(id => id !== socket.id);//filter the users ids to send to the client and make peer conction with them 
 
     socket.emit("all users", usersInThisRoom);
 });
