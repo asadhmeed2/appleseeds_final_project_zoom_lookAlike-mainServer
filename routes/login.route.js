@@ -15,6 +15,8 @@ Router.post('/login', function(req, res){
 Router.post('/logout',authenticateToken, function(req, res){
     logInController.logout(req, res);
 })
-
+Router.get("/", (req, res)=>{
+res.status(200).json("my server")
+})
 
 module.exports = Router;
