@@ -82,7 +82,6 @@ const login = (req, res) => {
                 { refreshToken: refreshToken, islogedin: true, uniqid: uniqid },{new: true},
                 (err, data) => {
                   if (err) return res.status(401).send("user does not exist");
-                  console.log('85 user controller ',user);
                   return res
                     .status(200)
                     .send({

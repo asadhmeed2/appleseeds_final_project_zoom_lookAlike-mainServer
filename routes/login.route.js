@@ -20,7 +20,6 @@ res.status(200).json("my server")
 })
 
 Router.get('/auth',authenticateToken, (req, res)=>{
-    console.log(req.user);
 res.status(200).json(req.user);
 })
 
