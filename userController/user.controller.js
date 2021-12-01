@@ -1,103 +1,118 @@
 const userModule = require("../modules/user.module");
 const registerModule = require("../modules/registerSecretNumber.module");
-const {deleteSecretNumber} = require("../userController/admin.controller")
-const { v4: uuidv4 } = require('uuid');
+const { deleteSecretNumber } = require("../userController/admin.controller");
+const { v4: uuidv4 } = require("uuid");
 const auth = require("../auth/auth");
-
-
 
 const register = (req, res) => {
   const { userName, email, password, registerNumber } = req.body;
-    registerModule.findOne({ registerNumber: registerNumber }, (err, data) => {
+  registerModule.findOne({ registerNumber: registerNumber }, (err, data) => {
+    if (err) {
+      return res.sendStatus(401);
+    }
+    userModule.findOne({ email: email }, (err, data) => {
       if (err) {
-        return res.sendStatus(401);
+        return res.status(401).send("user already exist");
       }
-      userModule.findOne({ email: email }, (err, data) => {
-        if (err) {
-          return res.status(401).send("user already exist");
-        }if(data){
-          return res.status(401).send("user already exist");
-        }
-        const user = new userModule({
-          userName,
-          email,
-          password,
-          role: "user",
-        });
-        deleteSecretNumber(registerNumber);
-        user.save();
-        return res.status(200).json({
-         msg: "registered successfully"
-        });
+      if (data) {
+        return res.status(401).send("user already exist");
+      }
+      const user = new userModule({
+        userName,
+        email,
+        password,
+        role: "user",
       });
-    })
+      deleteSecretNumber(registerNumber);
+      user.save();
+      return res.status(200).json({
+        msg: "registered successfully",
+      });
+    });
+  });
 };
 /**
- * 
- * @param {*} req 
- * @param {*} res 
+ *
+ * @param {*} req
+ * @param {*} res
  */
 const login = (req, res) => {
   const { email, password } = req.body;
-  console.log("email: ",email);
-  console.log("password: ",password);
-  const uniqid=uuidv4()// unique id to adentify the user when logout
-  userModule.findOne({ email: email }, (err, data) => {
+  console.log("email: ", email);
+  console.log("password: ", password);
+  const uniqid = uuidv4(); // unique id to adentify the user when logout
+  userModule.findOne({ email: email }, (err, user) => {
     if (err) {
       console.log(err);
-      return res.status(401).send({msg:"email or password incorrect"});
+      return res.status(401).send({ msg: "email or password incorrect" });
     }
-    console.log(data);
-    if (password === data.password) {
-      if(data.role !== "admin"){
-        userModule.find({role: "admin"},(err,data) => {
+    console.log(user);
+    if (!user) {
+      return res.status(404).send({ msg: "email or password incorrect" });
+    }
+    if (user && password === user.password) {
+      if (user.role !== "admin") {
+        userModule.find({ role: "admin" }, (err, admins) => {
           if (err) {
-            return false;
+            return res.status(401).send({ msg: "error cannot connect to data base" });
           }
-          if(!data){
-            return false;
+          if (!admins) {
+            return res.status(404).send({ msg: "no admin in data base" });
           }
-          if(data){
-            let adminIsLogedin=false;
-            data.forEach(user => {
-              
-              if(user.islogedin){
-                adminIsLogedin= true;
+          if (admins) {
+            let adminIsLogedin = false;
+            admins.forEach((user) => {
+              if (user.islogedin) {
+                adminIsLogedin = true;
               }
-            })
-            if(!adminIsLogedin){
-              return res.status(401).json({msg:"the host is not loged in",adminLogedIn:false});
-            }else{
-
-              const { accessToken, refreshToken } = auth.createTokens(req, data.role,uniqid);
+            });
+            if (!adminIsLogedin) {
+              return res
+                .status(401)
+                .json({ msg: "the host is not loged in", adminLogedIn: false });
+            } else {
+              const { accessToken, refreshToken } = auth.createTokens(
+                req,
+                user.role,
+                uniqid
+              );
+              console.log(uniqid);
               userModule.findByIdAndUpdate(
-                data._id,
-                { refreshToken: refreshToken ,islogedin:true ,uniqid:uniqid},
+                user._id,
+                { refreshToken: refreshToken, islogedin: true, uniqid: uniqid },{new: true},
                 (err, data) => {
                   if (err) return res.status(401).send("user does not exist");
-                    return res
-                      .status(200)
-                      .send({ accessToken: accessToken, refreshToken: refreshToken });
+                  console.log('85 user controller ',user);
+                  return res
+                    .status(200)
+                    .send({
+                      accessToken: accessToken,
+                      refreshToken: refreshToken,
+                    });
                 }
               );
             }
           }
-        })
-      }else{
-        const { accessToken, refreshToken } = auth.createTokens(req, data.role,uniqid);
+        });
+      } else {
+        const { accessToken, refreshToken } = auth.createTokens(
+          req,
+          user.role,
+          uniqid
+        );
         userModule.findByIdAndUpdate(
-          data._id,
-          { refreshToken: refreshToken ,islogedin:true,uniqid:uniqid},
+          user._id,
+          { refreshToken: refreshToken, islogedin: true, uniqid: uniqid },{new: true},
           (err, data) => {
             if (err) return res.status(401).send("user does not exist");
-              return res
-                .status(200)
-                .send({ accessToken: accessToken, refreshToken: refreshToken });
+            return res
+              .status(200)
+              .send({ accessToken: accessToken, refreshToken: refreshToken });
           }
         );
       }
-    }else{
-      return res.status(401).json({msg:"email or password incorrect"})
+    } else {
+      return res.status(404).json({ msg: "email or password incorrect" });
     }
   });
 };
@@ -129,16 +144,14 @@ const logout = (req, res) => {
     }
     userModule.findByIdAndUpdate(
       data._id,
-      { refreshToken: "" ,islogedin:false},
+      { refreshToken: "", islogedin: false },
       (err, data) => {
         if (err) return res.status(401).send("user does not exist");
-        return res
-          .status(200)
-          .json({
-            adminLogedOut: false,
-            userLogedOut: true,
-            msg: "logout successfully",
-          });
+        return res.status(200).json({
+          adminLogedOut: false,
+          userLogedOut: true,
+          msg: "logout successfully",
+        });
       }
     );
   });
