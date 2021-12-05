@@ -18,8 +18,8 @@ let usersLogedInUuid={}
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("join room", userData => {
-    let user ={id:userData.uniqid,roomID:userData.roomID}
-    socket.join(user.roomID);
+    // let user ={id:userData.uniqid,roomID:userData.roomID}
+    // socket.join(user.roomID);
     // if(usersLogedInUuid[userData.uniqid]){
     //   socket.emit('user already joined');
     // }
@@ -42,39 +42,19 @@ io.on("connection", (socket) => {
       socket.emit("all users", usersInThisRoom);
     // }
 });
+socket.on("user join the chat",()=>{
+
+})
 
 socket.on("sending signal", payload => {//reseve 
     io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
 });
-// socket.on("user got back to home" ,id=>{
-//   const roomID = socketToRoom[socket.id];
-//   let room = users[roomID];
-//   if (room) {
-//       room = room.filter(id => id !== socket.id);
-//       users[roomID] = [...room];
-//   }
-//   socket.broadcast.emit("user left", socket.id);
-// });
+
 
 socket.on("returning signal", payload => {
     io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
 });
-// socket.on("room created", roomData => {
-//   roomsLinks[roomData.roomID] = roomData;
-//   console.log('roomData',roomData);
-//     io.emit('all rooms links', roomsLinks);
-// });
-// socket.on('home page refreshed',()=>{
-//   io.emit('all rooms links', roomsLinks);
-// });
-// socket.on('remove all rooms',()=>{
-//   console.log(roomsLinks);
-//   io.emit('destroy all peers');
-//   io.emit('forced logout')
-//   roomsLinks={}
-//   socketToRoom={}
-//   users={}
-// })
+
 
 socket.on('disconnect', () => {
   console.log('user disconnect');
@@ -87,6 +67,14 @@ socket.on('disconnect', () => {
     }
     socket.broadcast.to(roomID).emit("user left", socket.id);
 });
+
+socket.on('change', (payload) => {
+  socket.broadcast.emit('change',payload)
+});
+
+socket.on("message",({userName,message})=>{
+  io.emit('message',{userName,message})               
+})
 });
 
 app.use("/",loginRouter);
