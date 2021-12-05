@@ -14,12 +14,16 @@ const server = http.createServer(app);
 const io = require("socket.io")(server);
 let users = {};//save users  ids that connected to particular room with room id key
 let socketToRoom = {};// save users id and witch room thear in
-let roomsLinks={}  
+let usersLogedInUuid={}  
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("join room", userData => {
     let user ={id:userData.uniqid,roomID:userData.roomID}
     socket.join(user.roomID);
+    // if(usersLogedInUuid[userData.uniqid]){
+    //   socket.emit('user already joined');
+    // }
+    usersLogedInUuid[userData.uniqid]=userData.uniqid;
     if (users[userData.roomID]) {//if there is some one connected to the room 
         //  user = users[room.roomID].find(user => user.uniqid === room.uniqid)
         // console.log(user);
@@ -42,27 +46,27 @@ io.on("connection", (socket) => {
 socket.on("sending signal", payload => {//reseve 
     io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
 });
-socket.on("user got back to home" ,id=>{
-  const roomID = socketToRoom[socket.id];
-  let room = users[roomID];
-  if (room) {
-      room = room.filter(id => id !== socket.id);
-      users[roomID] = [...room];
-  }
-  socket.broadcast.emit("user left", socket.id);
-});
+// socket.on("user got back to home" ,id=>{
+//   const roomID = socketToRoom[socket.id];
+//   let room = users[roomID];
+//   if (room) {
+//       room = room.filter(id => id !== socket.id);
+//       users[roomID] = [...room];
+//   }
+//   socket.broadcast.emit("user left", socket.id);
+// });
 
 socket.on("returning signal", payload => {
     io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
 });
-socket.on("room created", roomData => {
-  roomsLinks[roomData.roomID] = roomData;
-  console.log('roomData',roomData);
-    io.emit('all rooms links', roomsLinks);
-});
-socket.on('home page refreshed',()=>{
-  io.emit('all rooms links', roomsLinks);
-});
+// socket.on("room created", roomData => {
+//   roomsLinks[roomData.roomID] = roomData;
+//   console.log('roomData',roomData);
+//     io.emit('all rooms links', roomsLinks);
+// });
+// socket.on('home page refreshed',()=>{
+//   io.emit('all rooms links', roomsLinks);
+// });
 // socket.on('remove all rooms',()=>{
 //   console.log(roomsLinks);
 //   io.emit('destroy all peers');
