@@ -15,7 +15,7 @@ const io = require("socket.io")(server);
 let users = {};//save users  ids that connected to particular room with room id key
 let socketToRoom = {};// save users id and witch room thear in
 let usersLogedInUuid={}  
-let messages=[]
+
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("join room", userData => {
@@ -41,12 +41,9 @@ io.on("connection", (socket) => {
       const usersInThisRoom = users[userData.roomID].filter(id => id !== socket.id);//filter the users ids to send to the client and make peer conction with them 
       console.log('usersInThisRoom',usersInThisRoom);
       socket.emit("all users", usersInThisRoom);
-      socket.emit('all messages',messages)
     // }
 });
-socket.on("user join the chat",()=>{
 
-})
 
 socket.on("sending signal", payload => {//reseve 
     io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
@@ -67,17 +64,14 @@ socket.on('disconnect', () => {
         room = room.filter(id => id !== socket.id);
         users[roomID] = [...room];
     }
-    socket.broadcast.to(roomID).emit("user left", socket.id);
+    socket.broadcast.emit("user left", socket.id);
 });
 
 socket.on('change', (payload) => {
   socket.broadcast.emit('change',payload)
 });
 
-socket.on("message",({userName,message})=>{
-  messages.unshift({userName,message});
-  io.emit('all messages', messages)               
-})
+
 });
 
 app.use("/",loginRouter);
