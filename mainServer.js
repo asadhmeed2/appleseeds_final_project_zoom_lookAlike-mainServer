@@ -24,6 +24,7 @@ io.on("connection", (socket) => {
     // if(usersLogedInUuid[userData.uniqid]){
     //   socket.emit('user already joined');
     // }
+    socket.join(userData.roomID);
     usersLogedInUuid[userData.uniqid]=userData.uniqid;
     if (users[userData.roomID]) {//if there is some one connected to the room 
         //  user = users[room.roomID].find(user => user.uniqid === room.uniqid)
