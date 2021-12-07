@@ -133,12 +133,13 @@ const logoutToAllUsers = () => {
 };
 const logout = (req, res) => {
   const { uniqid } = req.user;
+  
   userModule.findOne({ uniqid: uniqid }, (err, data) => {
     if (err) {
       return res.status(401).send("user does not exist");
     }
     if (data.role === "admin") {
-      logoutToAllUsers();
+      // logoutToAllUsers();
       return res.status(200).json({ adminLogedOut: true });
     }
     userModule.findByIdAndUpdate(
@@ -154,7 +155,6 @@ const logout = (req, res) => {
       }
     );
   });
-  res.sendStatus(200);
 };
 
 module.exports = {

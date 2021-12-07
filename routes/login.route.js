@@ -12,7 +12,8 @@ Router.post('/login', function(req, res){
     logInController.login(req, res);
 })
 
-Router.post('/logout',authenticateToken, function(req, res){
+Router.get('/logout',authenticateToken, function(req, res){
+    console.log("uniqid",req.user);
     logInController.logout(req, res);
 })
 Router.get("/", (req, res)=>{
