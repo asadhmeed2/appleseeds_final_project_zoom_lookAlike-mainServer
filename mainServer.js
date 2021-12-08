@@ -71,7 +71,9 @@ socket.on('disconnect', () => {
 socket.on('change', (payload) => {
   socket.broadcast.emit('change',payload)
 });
-
+socket.on("logout all",()=>{
+  socket.broadcast.emit('logout')
+})
 
 });
 
