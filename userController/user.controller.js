@@ -38,15 +38,12 @@ const register = (req, res) => {
  */
 const login = (req, res) => {
   const { email, password } = req.body;
-  console.log("email: ", email);
-  console.log("password: ", password);
   const uniqid = uuidv4(); // unique id to adentify the user when logout
   userModule.findOne({ email: email }, (err, user) => {
     if (err) {
       console.log(err);
       return res.status(401).send({ msg: "email or password incorrect" });
     }
-    console.log(user);
     if (!user) {
       return res.status(404).send({ msg: "email or password incorrect" });
     }
@@ -76,7 +73,6 @@ const login = (req, res) => {
                 user.role,
                 uniqid
               );
-              console.log(uniqid);
               userModule.findByIdAndUpdate(
                 user._id,
                 { refreshToken: refreshToken, islogedin: true, uniqid: uniqid },{new: true},

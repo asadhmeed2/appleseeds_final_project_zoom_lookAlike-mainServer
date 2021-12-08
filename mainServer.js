@@ -60,7 +60,6 @@ socket.on('disconnect', () => {
   console.log('user disconnect');
     const roomID = socketToRoom[socket.id];
     let room = users[roomID];
-    console.log(room);
     if (room) {
         room = room.filter(id => id !== socket.id);
         users[roomID] = [...room];
