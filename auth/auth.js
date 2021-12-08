@@ -26,19 +26,21 @@ function createTokens(req,role,uniqid) {
  * @returns 
  */
 function authenticateToken(req, res, next) {
-    
+    console.log("req.headers.authorization",req.headers.authorization);
     const authHeader = req.headers["authorization"];
-    console.log("token",authHeader);
+    console.log("31 auth header",authHeader);
     const token = authHeader && authHeader.split(" ")[1]; 
     //     \/
     // bearer TOKEN
     if (token == null) {
       return res.sendStatus(401);
     }
+    console.log("32 auth token",token);
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
       if (err) {
         return res.status(403).send("");
       }
+      console.log("42 auth decoded", decoded);
       req.user = decoded;
       next();
     });

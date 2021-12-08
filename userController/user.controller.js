@@ -47,6 +47,7 @@ const login = (req, res) => {
     if (!user) {
       return res.status(404).send({ msg: "email or password incorrect" });
     }
+    console.log("50 user",user);
     if (user && password === user.password) {
       if (user.role !== "admin") {
         userModule.find({ role: "admin" }, (err, admins) => {
@@ -78,6 +79,7 @@ const login = (req, res) => {
                 { refreshToken: refreshToken, islogedin: true, uniqid: uniqid },{new: true},
                 (err, data) => {
                   if (err) return res.status(401).send("user does not exist");
+                  
                   return res
                     .status(200)
                     .send({
@@ -95,11 +97,13 @@ const login = (req, res) => {
           user.role,
           uniqid
         );
+        console.log("100 new accessToken",accessToken);
         userModule.findByIdAndUpdate(
           user._id,
-          { refreshToken: refreshToken, islogedin: true, uniqid: uniqid },{new: true},
+          { refreshToken: refreshToken, islogedin: true, uniqid: uniqid },{new:true},
           (err, data) => {
             if (err) return res.status(401).send("user does not exist");
+            console.log("105 updated usre " ,data);
             return res
               .status(200)
               .send({ accessToken: accessToken, refreshToken: refreshToken });
@@ -111,41 +115,25 @@ const login = (req, res) => {
     }
   });
 };
-const logoutToAllUsers = () => {
-  userModule.find({}, (err, data) => {
-    data.forEach((user) => {
-      userModule.findByIdAndUpdate(
-        user._id,
-        { refreshToken: "" },
-        (err, data) => {
-          if (err) return res.status(401).send("");
-          return res
-            .status(200)
-            .send({ adminLogedOut: true, msg: "the admin hase loged out" });
-        }
-      );
-    });
-  });
-};
+
 const logout = (req, res) => {
   const { uniqid } = req.user;
-  
+  console.log("uniqid",uniqid);
   userModule.findOne({ uniqid: uniqid }, (err, data) => {
     if (err) {
       return res.status(401).send("user does not exist");
     }
-    if (data.role === "admin") {
-      // logoutToAllUsers();
-      return res.status(200).json({ adminLogedOut: true });
-    }
+    console.log("data",data);
     userModule.findByIdAndUpdate(
       data._id,
       { refreshToken: "", islogedin: false },
       (err, data) => {
-        if (err) return res.status(401).send("user does not exist");
+        if (err) return res.status(401).send({msg:"user does not exist"});
+    if (data.role === "admin") {
+      return res.status(200).json({ adminLogedOut: true });
+    }
         return res.status(200).json({
           adminLogedOut: false,
-          userLogedOut: true,
           msg: "logout successfully",
         });
       }
