@@ -11,6 +11,7 @@ const userModule = new UserSchema({
     type: String,
     match: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
     required: true,
+    unique: true
   },
   password: {
     type: String,

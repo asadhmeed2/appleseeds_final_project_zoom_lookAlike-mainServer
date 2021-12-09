@@ -40,10 +40,12 @@ const addSecretNumber = (req, res) => {
     });
   };
   const deleteSecretNumber = (registerNumber) => {
+    console.log("number well be deleted");
     registerModule.findOneAndDelete(
       { registerNumber: registerNumber },
       (err, data) => {
         if (err) return 
+        console.log("number was deleted ",data);
       }
     );
   };

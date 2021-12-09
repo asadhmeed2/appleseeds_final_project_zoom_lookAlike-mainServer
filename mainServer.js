@@ -19,30 +19,19 @@ let usersLogedInUuid={}
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("join room", userData => {
-    // let user ={id:userData.uniqid,roomID:userData.roomID}
-    // socket.join(user.roomID);
-    // if(usersLogedInUuid[userData.uniqid]){
-    //   socket.emit('user already joined');
-    // }
     socket.join(userData.roomID);
     usersLogedInUuid[userData.uniqid]=userData.uniqid;
     if (users[userData.roomID]) {//if there is some one connected to the room 
-        //  user = users[room.roomID].find(user => user.uniqid === room.uniqid)
-        // console.log(user);
-        // if(!user){
           users[userData.roomID].push(socket.id); // add the new user socket id to the room  
-        // }else{
-        //   socket.emit("already in the room");
-        // }
     } else {
         users[userData.roomID] = [socket.id];//initialize the room weth the first user socket id 
     }
-    // if(!user){
+
       socketToRoom[socket.id] = userData.roomID; //add the user id and room id to the socketToRoom
       const usersInThisRoom = users[userData.roomID].filter(id => id !== socket.id);//filter the users ids to send to the client and make peer conction with them 
       console.log('usersInThisRoom',usersInThisRoom);
       socket.emit("all users", usersInThisRoom);
-    // }
+
 });
 
 

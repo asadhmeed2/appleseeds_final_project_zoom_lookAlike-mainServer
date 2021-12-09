@@ -23,8 +23,13 @@ const register = (req, res) => {
         password,
         role: "user",
       });
+      console.log("ea7174a9-4df6-4308-b4e8-cf9777ecaa11 registerNumber",registerNumber);
       deleteSecretNumber(registerNumber);
-      user.save();
+      user.save((err, data)=>{
+        if (err) {
+          return res.status(406).send({msg:"data is not allowed"});
+        }
+      });
       return res.status(200).json({
         msg: "registered successfully",
       });
