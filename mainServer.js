@@ -56,12 +56,12 @@ socket.on('disconnect', () => {
     socket.broadcast.emit("user left", socket.id);
 });
 
-socket.on('change', (payload) => {
-  socket.broadcast.emit('change',payload)
-});
-socket.on("logout all",()=>{
-  socket.broadcast.emit('logout')
-})
+// socket.on('change', (payload) => {
+//   socket.broadcast.emit('change',payload)
+// });
+// socket.on("logout all",()=>{
+//   socket.broadcast.emit('logout')
+// })
 
 });
 
