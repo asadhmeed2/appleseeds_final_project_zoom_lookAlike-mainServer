@@ -128,6 +128,9 @@ const logout = (req, res) => {
     if (err) {
       return res.status(401).send("user does not exist");
     }
+    if(!data){
+      return res.status(401).send("user does not exist");
+    }
     console.log("data",data);
     userModule.findByIdAndUpdate(
       data._id,
