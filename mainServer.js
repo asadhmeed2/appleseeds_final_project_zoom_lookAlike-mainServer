@@ -64,7 +64,9 @@ socket.on('disconnect', () => {
 // })
 
 });
-
+app.get('/', (req, res) => {
+  return res.status(200).send(`<h1>privet chat app<h1/>`)
+})
 app.use("/",loginRouter);
 app.use("/",adminRouter);
 mongoose.connect(
