@@ -1,6 +1,6 @@
 # group video chat web app main server
 
-## Decription
+## Description
 a server application for private group [video chat app](https://github.com/newasad/appleseeds_final_project_zoom_lookAlike) 
 
 ## Technologies
