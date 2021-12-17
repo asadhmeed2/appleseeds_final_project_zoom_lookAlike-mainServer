@@ -6,7 +6,7 @@ a server application for private group [video chat app](https://github.com/newas
 ## Technologies
 nodeJS, Express, socket.io, MongoDB.
 
-#### links to servers github repositories of the client app
+#### links to servers github repositories 
 
 [chat server git repo](https://github.com/newasad/appleseeds_final_project_zoom_lookAlike-chatServer)
 
