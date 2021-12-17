@@ -1,7 +1,7 @@
-# grope video chat web app main server
+# group video chat web app main server
 
 ## Decription
-a server application for private grope [video chat app](https://github.com/newasad/appleseeds_final_project_zoom_lookAlike) 
+a server application for private group [video chat app](https://github.com/newasad/appleseeds_final_project_zoom_lookAlike) 
 
 ## Technologies
 nodeJS, Express, socket.io, MongoDB.
